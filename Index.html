@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HomeEase — Modern Minimal Home</title>
+  <meta name="description" content="HomeEase - household items store (demo). Modern, minimal HTML/CSS/JS single-file home page with product grid and cart drawer." />
+
+  <style>
+    :root{
+      --bg:#f7f8fb;
+      --card:#ffffff;
+      --muted:#8b93a7;
+      --accent:#2563eb; /* blue */
+      --radius:12px;
+      --shadow: 0 6px 20px rgba(32,41,63,0.08);
+      --container:1100px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:#111827;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.4;
+      padding:36px 20px;
+    }
+    .wrap{max-width:var(--container);margin:0 auto}
+
+    /* header */
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#60a5fa,#a78bfa);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;box-shadow:var(--shadow)}
+    .title{font-weight:700;font-size:18px}
+    nav{display:flex;align-items:center;gap:12px}
+    .search{background:var(--card);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow)}
+    .search input{border:0;outline:0;background:transparent;width:220px}
+    .icon-btn{background:transparent;border:0;padding:8px;border-radius:10px;cursor:pointer}
+    .cart-btn{position:relative}
+    .cart-count{position:absolute;right:6px;top:6px;background:#ef4444;color:white;font-size:12px;padding:3px 6px;border-radius:999px}
+
+    /* hero */
+    .hero{background:linear-gradient(180deg,transparent,rgba(0,0,0,0.02));padding:28px;border-radius:16px;display:flex;gap:28px;align-items:center;box-shadow:var(--shadow);background-image: linear-gradient(90deg, rgba(96,165,250,0.06) 0%, rgba(167,139,250,0.03) 100%);}
+    .hero-left{flex:1}
+    .eyebrow{color:var(--muted);font-weight:600;font-size:13px}
+    .headline{font-size:28px;font-weight:800;margin:6px 0}
+    .sub{color:var(--muted);max-width:540px}
+    .cta{margin-top:18px}
+    .btn{background:var(--accent);color:white;padding:10px 16px;border-radius:10px;border:0;cursor:pointer;font-weight:700;box-shadow:0 8px 24px rgba(37,99,235,0.12)}
+
+    .hero-right{width:360px}
+    .hero-card{background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow);display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center}
+    .p-thumb{width:72px;height:72px;border-radius:10px;object-fit:cover}
+    .p-title{font-weight:700}
+    .p-meta{color:var(--muted);font-size:13px}
+
+    /* sections */
+    section{margin-top:28px}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    @media (max-width:1000px){.grid{grid-template-columns:repeat(3,1fr)} .hero-right{display:none}}
+    @media (max-width:720px){.grid{grid-template-columns:repeat(2,1fr)} body{padding:20px} header{flex-direction:column;align-items:flex-start} .search input{width:140px}}
+    @media (max-width:420px){.grid{grid-template-columns:1fr} .headline{font-size:22px}}
+
+    .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+    .prod-img{height:160px;border-radius:10px;object-fit:cover;width:100%}
+    .prod-title{font-weight:700;font-size:15px}
+    .price-row{display:flex;align-items:center;justify-content:space-between}
+    .price{font-weight:800}
+    .add{background:transparent;border:1px solid rgba(15,23,42,0.06);padding:8px;border-radius:10px;cursor:pointer}
+
+    /* categories */
+    .cats{display:flex;gap:12px}
+    .cat{background:var(--card);padding:12px;border-radius:12px;box-shadow:var(--shadow);min-width:120px;text-align:center}
+
+    footer{margin-top:36px;color:var(--muted);font-size:14px;text-align:center}
+
+    /* cart drawer */
+    .cart-drawer{position:fixed;right:20px;top:80px;width:360px;background:var(--card);height:70vh;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,0.12);padding:16px;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.2,.9,.28,1);z-index:60}
+    .cart-drawer.open{transform:translateX(0)}
+    .cart-list{overflow:auto;flex:1;display:flex;flex-direction:column;gap:10px;padding-right:8px}
+    .cart-item{display:flex;gap:12px;align-items:center}
+    .cart-item img{width:64px;height:64px;border-radius:8px;object-fit:cover}
+    .qty{display:flex;gap:6px;align-items:center}
+    .ghost{background:transparent;border:0;color:var(--muted);font-weight:700}
+    .empty{color:var(--muted);text-align:center;padding:40px 0}
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">HE</div>
+        <div>
+          <div class="title">HomeEase</div>
+          <div style="color:var(--muted);font-size:13px">Everyday household items</div>
+        </div>
+      </div>
+
+      <nav>
+        <div class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35" stroke="#9AA3B2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <input id="searchInput" placeholder="Search household items..." />
+        </div>
+
+        <button class="icon-btn" title="Favorites" aria-label="favorites">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-6.16-4.35-8.24-6.43C1.78 12.54 2.3 8.9 5.6 6.9 8.02 5.35 11.05 6.04 12 8c.95-1.96 3.98-2.65 6.4-1.1 3.3 2 3.82 5.64 1.84 7.67C18.16 16.65 12 21 12 21z" stroke="#374151" stroke-width="0.6"/></svg>
+        </button>
+
+        <button class="icon-btn cart-btn" id="cartBtn" aria-label="cart">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6h15l-1.5 9h-11z" stroke="#374151" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <div class="hero">
+        <div class="hero-left">
+          <div class="eyebrow">Premium household picks</div>
+          <h1 class="headline">Make your house feel like home — small upgrades, big comfort.</h1>
+          <p class="sub">Discover curated household essentials — from kitchen helpers to cozy home organization. Fast browsing, clean interface, and a minimal shopping experience.</p>
+
+          <div class="cta">
+            <button class="btn" id="shopNow">Shop Now</button>
+          </div>
+        </div>
+
+        <div class="hero-right">
+          <div class="hero-card">
+            <img class="p-thumb" src="https://picsum.photos/seed/plate/400/400" alt="sample"/>
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between"><div class="p-title">Ceramic Dinner Set</div><div class="p-meta">$49</div></div>
+              <div class="p-meta">Minimal design • Dishwasher safe</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section>
+        <div class="section-head">
+          <h3 style="margin:0">Featured products</h3>
+          <div style="color:var(--muted);font-size:14px">Top picks for your home</div>
+        </div>
+        <div class="grid" id="productGrid">
+          <!-- Product cards inserted here by JS -->
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h3 style="margin:0">Browse categories</h3>
+          <div style="color:var(--muted);font-size:14px">Hand-picked sections</div>
+        </div>
+        <div class="cats">
+          <div class="cat">Kitchen</div>
+          <div class="cat">Cleaning</div>
+          <div class="cat">Storage</div>
+          <div class="cat">Decor</div>
+        </div>
+      </section>
+
+      <footer>
+        © <span id="yr"></span> HomeEase — Built with HTML, CSS & JavaScript • Demo site
+      </footer>
+    </main>
+  </div>
+
+  <!-- Cart drawer -->
+  <div class="cart-drawer" id="cartDrawer" aria-hidden="true">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-weight:800">Your cart</div>
+      <div style="color:var(--muted)">Items: <span id="cartItemsCount">0</span></div>
+    </div>
+    <div class="cart-list" id="cartList">
+      <div class="empty">Your cart is empty — add something you love ✨</div>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:space-between">
+      <div style="font-weight:700">Total: $<span id="cartTotal">0.00</span></div>
+      <div style="display:flex;gap:8px">
+        <button class="ghost" id="closeCart">Close</button>
+        <button class="btn" id="checkoutBtn">Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Sample product data ----------
+    const products = [
+      {id:1,title:'Ceramic Dinner Set',price:49.00,img:'https://picsum.photos/seed/plate/600/400',desc:'Minimal ceramic set — 4 plates, dishwasher safe.'},
+      {id:2,title:'Bamboo Cutting Board',price:19.00,img:'https://picsum.photos/seed/board/600/400',desc:'Durable bamboo cutting board with juice groove.'},
+      {id:3,title:'Stainless Steel Kettle',price:39.00,img:'https://picsum.photos/seed/kettle/600/400',desc:'1.5L fast-boil kettle with ergonomic handle.'},
+      {id:4,title:'Microfiber Cleaning Cloths (5pc)',price:12.50,img:'https://picsum.photos/seed/cloth/600/400',desc:'Super-absorbent reusable cloths.'},
+      {id:5,title:'Silicone Spatula Set',price:9.99,img:'https://picsum.photos/seed/spatula/600/400',desc:'Heat-resistant spatulas — set of 3.'},
+      {id:6,title:'Nesting Food Storage',price:29.00,img:'https://picsum.photos/seed/containers/600/400',desc:'Space-saving airtight containers.'},
+      {id:7,title:'Ceramic Planter',price:22.00,img:'https://picsum.photos/seed/planter/600/400',desc:'Small planter for succulents or herbs.'},
+      {id:8,title:'Wooden Soap Dish',price:8.00,img:'https://picsum.photos/seed/soap/600/400',desc:'Handmade wooden dish for soaps.'}
+    ];
+
+    // ---------- Render products ----------
+    const grid = document.getElementById('productGrid');
+    function renderProducts(list){
+      grid.innerHTML='';
+      list.forEach(p=>{
+        const card = document.createElement('div');
+        card.className='card';
+        card.innerHTML = `
+          <img class="prod-img" loading="lazy" src="${p.img}" alt="${p.title}" />
+          <div>
+            <div class="prod-title">${p.title}</div>
+            <div class="p-meta">${p.desc}</div>
+          </div>
+          <div class="price-row">
+            <div class="price">$${p.price.toFixed(2)}</div>
+            <button class="add" data-id="${p.id}">Add</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+    renderProducts(products);
+
+    // ---------- Cart logic using localStorage ----------
+    const CART_KEY = 'homeease_demo_cart_v1';
+    function getCart(){
+      try{return JSON.parse(localStorage.getItem(CART_KEY)) || []}catch(e){return []}
+    }
+    function saveCart(c){localStorage.setItem(CART_KEY,JSON.stringify(c));updateCartUI()}
+
+    function addToCart(id){
+      const p = products.find(x=>x.id===Number(id));
+      if(!p)return;
+      const cart = getCart();
+      const found = cart.find(i=>i.id===p.id);
+      if(found){found.qty += 1}else{cart.push({id:p.id,title:p.title,price:p.price,img:p.img,qty:1})}
+      saveCart(cart);
+    }
+
+    function removeItem(id){
+      let cart = getCart();
+      cart = cart.filter(i=>i.id!==Number(id));
+      saveCart(cart);
+    }
+
+    function changeQty(id,delta){
+      const cart = getCart();
+      const item = cart.find(i=>i.id===Number(id));
+      if(!item)return;
+      item.qty += delta;
+      if(item.qty<1) removeItem(id); else saveCart(cart);
+    }
+
+    function updateCartUI(){
+      const cart = getCart();
+      const count = cart.reduce((s,i)=>s+i.qty,0);
+      document.getElementById('cartCount').textContent = count;
+      document.getElementById('cartItemsCount').textContent = count;
+      const total = cart.reduce((s,i)=>s + i.qty * i.price,0);
+      document.getElementById('cartTotal').textContent = total.toFixed(2);
+
+      const list = document.getElementById('cartList');
+      list.innerHTML='';
+      if(cart.length===0){list.innerHTML='<div class="empty">Your cart is empty — add something you love ✨</div>';return}
+      cart.forEach(i=>{
+        const el = document.createElement('div');
+        el.className='cart-item';
+        el.innerHTML = `
+          <img src="${i.img}" alt="${i.title}" />
+          <div style="flex:1">
+            <div style="font-weight:700">${i.title}</div>
+            <div style="color:var(--muted);font-size:13px">$${i.price.toFixed(2)} • Qty: ${i.qty}</div>
+          </div>
+          <div class="qty">
+            <button class="ghost" data-action="dec" data-id="${i.id}">−</button>
+            <div style="min-width:22px;text-align:center">${i.qty}</div>
+            <button class="ghost" data-action="inc" data-id="${i.id}">+</button>
+            <button class="ghost" data-action="del" data-id="${i.id}" title="Remove">✕</button>
+          </div>
+        `;
+        list.appendChild(el);
+      })
+    }
+
+    // Attach product add buttons (event delegation)
+    document.addEventListener('click', (e)=>{
+      const add = e.target.closest('.add');
+      if(add){const id = add.dataset.id; addToCart(id);return}
+
+      const cartBtn = e.target.closest('#cartBtn');
+      if(cartBtn){openCart();return}
+
+      const close = e.target.closest('#closeCart');
+      if(close){closeCart();return}
+
+      const cAction = e.target.closest('[data-action]');
+      if(cAction){
+        const id = cAction.dataset.id; const action = cAction.dataset.action;
+        if(action==='inc') changeQty(id,1);
+        if(action==='dec') changeQty(id,-1);
+        if(action==='del') removeItem(id);
+        return;
+      }
+
+      const shopNow = e.target.closest('#shopNow');
+      if(shopNow){window.scrollTo({top:document.querySelector('#productGrid').offsetTop-20,behavior:'smooth'});return}
+
+      const checkout = e.target.closest('#checkoutBtn');
+      if(checkout){alert('This is a demo checkout. Integrate a payment gateway like Stripe when you are ready.');return}
+    })
+
+    // Cart drawer controls
+    const drawer = document.getElementById('cartDrawer');
+    function openCart(){drawer.classList.add('open');drawer.setAttribute('aria-hidden','false')}
+    function closeCart(){drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true')}
+
+    // Search
+    document.getElementById('searchInput').addEventListener('input', (e)=>{
+      const q = e.target.value.trim().toLowerCase();
+      if(!q) return renderProducts(products);
+      const filtered = products.filter(p=> (p.title + ' ' + p.desc).toLowerCase().includes(q));
+      renderProducts(filtered);
+    })
+
+    // Init
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    updateCartUI();
+
+    // Make sure add buttons re-bind after render (simple approach: observe grid)
+    const obs = new MutationObserver(()=>{/* nothing needed — event delegation handles it */});
+    obs.observe(grid,{childList:true});
+
+  </script>
+</body>
+</html>
